@@ -1,7 +1,10 @@
 import React from 'react';
+import {GridWidget} from "./components/GridWidget";
 
 function App() {
-  return <h1>Hello, React!</h1>;
+  return (
+      <GridWidget/>
+  );
 }
 
 export default App;

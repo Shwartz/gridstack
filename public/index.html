@@ -4,29 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GridStack</title>
-
-    <script src="../node_modules/gridstack/dist/gridstack-all.js"></script>
-    <link href="../node_modules/gridstack/dist/gridstack.min.css" rel="stylesheet"/>
     <style>
-        .grid-stack { background: #FAFAD2; }
-        .grid-stack-item-content { background-color: #18BC9C; }
+        .grid-stack {
+            background: #FAFAD2;
+        }
+
+        .grid-stack-item-content {
+            background-color: #18BC9C;
+        }
     </style>
 </head>
 <body>
-
-<div class="grid-stack"></div>
-
-<script type="text/javascript">
-  const items = [
-    {content: 'my first widget'}, // will default to location (0,0) and 1x1
-    {w: 2, content: 'another longer widget!'}, // will be placed next at (1,0) and 2x1
-    {h: 2, content: 'Some more'},
-  ];
-  const grid = GridStack.init();
-  grid.load(items);
-</script>
-
 <div id="root"></div>
-
 </body>
 </html>
