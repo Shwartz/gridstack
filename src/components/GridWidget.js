@@ -2,21 +2,41 @@ import React, {useEffect, useState, useRef} from "react";
 import {GridStack} from "gridstack";
 import '/node_modules/gridstack/dist/gridstack.min.css';
 
+const loremIpsum = 'Lorem ipsum dolor sit amet. Quo omnis doloribus ab rerum maiores aut labore autem in cupiditate velit sit voluptas nobis.'
+
+const addText = (ref) => ref.current.innerHTML = loremIpsum;
+
 function CompA() {
+  const targetRef = useRef(null);
   return (
-    <div>Component A</div>
+    <div>
+      <p>Component A</p>
+      <button type='button' onClick={() => addText(targetRef)}>Add Text</button>
+      <div ref={targetRef}></div>
+    </div>
   )
 }
 
 function CompB() {
+  const targetRef = useRef(null);
   return (
-    <div>Component B</div>
+    <div>
+      <p>Component B</p>
+      <button type='button' onClick={() => addText(targetRef)}>Add Text</button>
+      <div ref={targetRef}></div>
+    </div>
+
   )
 }
 
 function CompC() {
+  const targetRef = useRef(null);
   return (
-    <div>Component C</div>
+    <div>
+      <p>Component C</p>
+      <button type='button' onClick={() => addText(targetRef)}>Add Text</button>
+      <div ref={targetRef}></div>
+    </div>
   )
 }
 
@@ -40,7 +60,6 @@ export function GridWidget() {
     const grid = GridStack.init();
 
     grid.on('change', (event, items) => {
-      console.log({items})
       const newLayout = items.map(item => ({
         id: item.id,
         x: item.x,
