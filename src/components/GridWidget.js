@@ -1,41 +1,89 @@
-import React, {useEffect, useRef} from "react";
+import React, {useEffect, useState, useRef} from "react";
 import {GridStack} from "gridstack";
 import '/node_modules/gridstack/dist/gridstack.min.css';
 
-const CompA = () => {
+function CompA() {
   return (
-    <div className="grid-stack-item-content">Tiny A component</div>
+    <div>Component A</div>
   )
 }
 
-const items = [
-  {content: 'my first widget'}, // will default to location (0,0) and 1x1
-  {w: 2, content: 'another longer widget!'}, // will be placed next at (1,0) and 2x1
-  {h: 2, content: 'Some more'},
-  {content: <CompA/>}
-];
+function CompB() {
+  return (
+    <div>Component B</div>
+  )
+}
+
+function CompC() {
+  return (
+    <div>Component C</div>
+  )
+}
+
+const replaceItem = (arr, newItem) => {
+  return arr.map(item => item.id === newItem.id ? newItem : item);
+};
 
 const serializedData = [
-  {x: 0, y: 0, w: 2, h: 2, content: 'C1 -> x: 0, y: 0, w: 2, h: 2'},
-  {x: 2, y: 3, w: 3, content: 'C2 -> x: 2, y: 3, w: 3'},
-  {x: 1, y: 3, content: 'C3 -> x: 1, y: 3'}
+  {id: 1, x: 0, y: 0, w: 2, h: 2, content: 'C1 -> x: 0, y: 0, w: 2, h: 2', Comp: CompA},
+  {id: 2, x: 2, y: 3, w: 3, content: 'C2 -> x: 2, y: 3, w: 3', Comp: CompB},
+  {id: 3, x: 1, y: 3, content: 'C3 -> x: 1, y: 3', Comp: CompC}
 ];
 
-
+GridStack.init();
 
 export function GridWidget() {
+  const [layout, setLayout] = useState(serializedData);
   const gridRef = useRef(null);
 
   useEffect(() => {
-    console.log({gridRef});
-    if (gridRef) {
-      const grid = GridStack.init();
-      grid.load(serializedData);
-    }
+    const grid = GridStack.init();
 
+    grid.on('change', (event, items) => {
+      console.log({items})
+      const newLayout = items.map(item => ({
+        id: item.id,
+        x: item.x,
+        y: item.y,
+        w: item.w,
+        h: item.h,
+        content: item.el.textContent,
+        Comp: item.Comp,
+      }));
+      setLayout((item) => replaceItem(item, layout));
+    });
+
+    return () => {
+      grid.destroy();
+    };
   }, []);
 
   return (
-    <div ref={gridRef} className='grid-stack'></div>
-  )
+    <div className="grid-stack">
+      {layout.map((item, index) => {
+        const {id, x, y, w, h, Comp, content} = item;
+        return (
+          <div
+            className="grid-stack-item"
+            key={id}
+            gs-id={id}
+            id={`id-${id}`}
+            data-gs-x={x}
+            data-gs-y={y}
+            data-gs-width={w}
+            data-gs-height={h}
+            gs-x={x}
+            gs-y={y}
+            gs-w={w}
+            gs-h={h}
+          >
+            <div className="grid-stack-item-content">
+              {content}
+              <Comp />
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  );
 }
