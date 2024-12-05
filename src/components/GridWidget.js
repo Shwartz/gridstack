@@ -62,6 +62,7 @@ const serializedData = [
 export function GridWidget() {
   const [layout, setLayout] = useState(serializedData);
   const gridRef = useRef(null);
+  const widgetRefs = useRef([]);
 
   useEffect(() => {
     const grid = GridStack.init({
@@ -85,10 +86,29 @@ export function GridWidget() {
       setLayout((item) => replaceItem(item, layout));
     });
 
+    // Create a ResizeObserver
+    const observers = widgetRefs.current.map((widgetRef, index) => {
+      const observer = new ResizeObserver(entries => {
+        for (let entry of entries) {
+          const { height} = entry.contentRect;
+          grid.update(widgetRef.parentElement.parentElement, {
+            h: Math.ceil(height / grid.opts.cellHeight)
+          });
+        }
+      });
+
+      if (widgetRefs) {
+       observer.observe(widgetRef);
+      }
+
+      return observer;
+    });
+
     return () => {
       grid.destroy();
+      observers.forEach(observer => observer.disconnect());
     };
-  }, []);
+  }, [layout.length]);
 
   return (
     <div className="grid-stack" ref={gridRef}>
@@ -110,8 +130,8 @@ export function GridWidget() {
             gs-h={h}
           >
             <div className="grid-stack-item-content">
-              <div className='gridStack-inner-wrap'>
-                <Comp/>
+              <div className='gridStack-inner-wrap' ref={(el) => widgetRefs.current[index] = el}>
+                <Comp />
               </div>
             </div>
           </div>
