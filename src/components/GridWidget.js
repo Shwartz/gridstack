@@ -2,9 +2,23 @@ import React, {useEffect, useState, useRef, useCallback} from "react";
 import {GridStack} from "gridstack";
 import '/node_modules/gridstack/dist/gridstack.min.css';
 
-const loremIpsum = 'Lorem ipsum dolor sit amet. Quo omnis doloribus ab rerum maiores aut labore autem in cupiditate velit sit voluptas nobis.|< END >|'
-
-const addText = (ref) => ref.current.innerHTML = `${ref.current.innerHTML} + ${loremIpsum}`;
+const loremIpsum = '<p>Lorem ipsum dolor sit amet. Quo omnis doloribus ab rerum maiores aut labore autem in cupiditate velit sit voluptas nobis.|< END >|</p>'
+const tableIpsum = '<br/><table class="blueTable">\n' +
+  '<tr>\n' +
+  '  <th>Column 1</th>\n' +
+  '  <th>Column 2</th>\n' +
+  '  <th>Column 3</th>\n' +
+  '  <th>Column 4</th>\n' +
+  '  <th>Column 5</th>\n' +
+  '</tr>\n' +
+  '<tr><td>Data 1-1</td><td>Data 1-2</td><td>Data 1-3</td><td>Data 1-4</td><td>Data 1-5</td></tr>\n' +
+  '<tr><td>Data 2-1</td><td>Data 2-2</td><td>Data 2-3</td><td>Data 2-4</td><td>Data 2-5</td></tr>\n' +
+  '<tr><td>Data 3-1</td><td>Data 3-2</td><td>Data 3-3</td><td>Data 3-4</td><td>Data 3-5</td></tr>\n' +
+  '<tr><td>Data 4-1</td><td>Data 4-2</td><td>Data 4-3</td><td>Data 4-4</td><td>Data 4-5</td></tr>\n' +
+  '<tr><td>Data 5-1</td><td>Data 5-2</td><td>Data 5-3</td><td>Data 5-4</td><td>Data 5-5</td></tr>\n' +
+  '</table>'
+const addText = (ref) => ref.current.innerHTML = `${ref.current.innerHTML} ${loremIpsum}`;
+const addTable = (ref) => ref.current.innerHTML = `${ref.current.innerHTML} ${tableIpsum}`;
 const removeText = (ref) => ref.current.innerHTML = '';
 
 function Buttons({targetRef}) {
@@ -12,6 +26,7 @@ function Buttons({targetRef}) {
   return (
     <div className='flex'>
       <button type='button' onClick={() => addText(targetRef)}>Add Text</button>
+      <button type='button' onClick={() => addTable(targetRef)}>Add Table</button>
       <button type='button' onClick={() => removeText(targetRef)}>Remove Text</button>
     </div>
   )
