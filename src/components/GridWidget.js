@@ -75,9 +75,7 @@ export function GridWidget() {
       const gridItem = entry.target.closest('.grid-stack-item');
 
       if (gridItem) {
-        grid.update(gridItem, {
-          h: Math.max(1, Math.ceil(height / grid.opts.cellHeight)),
-        });
+        grid.resizeToContent(gridItem);
       } else {
         console.error('no item!')
       }
