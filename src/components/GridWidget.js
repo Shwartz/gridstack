@@ -66,6 +66,7 @@ export function GridWidget() {
   const gridInstanceRef = useRef(null);
 
   const resizeObserverCallback = useCallback((entries) => {
+    console.log('calling resizeObserverCallback')
     const grid = gridInstanceRef.current;
     if (!grid) return;
 
@@ -86,7 +87,7 @@ export function GridWidget() {
   useEffect(() => {
     if (!gridRef.current) return;
 
-    gridInstanceRef.current = GridStack.init({
+    const grid = gridInstanceRef.current = GridStack.init({
       sizeToContent: true,
       margin: '8px',
       acceptWidgets: true,
@@ -94,9 +95,8 @@ export function GridWidget() {
       minRow: 1,
     }, gridRef.current);
 
-    const grid = gridInstanceRef.current;
-
     grid.on('change', (event, items) => {
+      console.log(event.currentTarget)
       const newLayout = items.map(item => ({
         id: item.id,
         x: item.x,
@@ -106,7 +106,7 @@ export function GridWidget() {
         Comp: item.Comp,
       }));
       console.log('grid.on("change")');
-      setLayout((item) => replaceItem(item, layout));
+      setLayout((item) => replaceItem(item, newLayout));
     });
 
     // Create a ResizeObserver
@@ -145,7 +145,7 @@ export function GridWidget() {
             gs-h={h}
           >
             <div className="grid-stack-item-content">
-              <div className='gridStack-inner-wrap' ref={(el) => widgetRefs.current[index] = el}>
+              <div className='gridStack-inner-wrap' ref={(el) => widgetRefs.current[item.id] = el}>
                 <Comp/>
               </div>
             </div>
