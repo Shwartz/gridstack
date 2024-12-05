@@ -2,16 +2,27 @@ import React, {useEffect, useState, useRef} from "react";
 import {GridStack} from "gridstack";
 import '/node_modules/gridstack/dist/gridstack.min.css';
 
-const loremIpsum = 'Lorem ipsum dolor sit amet. Quo omnis doloribus ab rerum maiores aut labore autem in cupiditate velit sit voluptas nobis.'
+const loremIpsum = 'Lorem ipsum dolor sit amet. Quo omnis doloribus ab rerum maiores aut labore autem in cupiditate velit sit voluptas nobis.|< END >|'
 
-const addText = (ref) => ref.current.innerHTML = loremIpsum;
+const addText = (ref) => ref.current.innerHTML = `${ref.current.innerHTML} + ${loremIpsum}`;
+const removeText = (ref) => ref.current.innerHTML = '';
+
+function Buttons({targetRef}) {
+  if (!targetRef) return null
+  return (
+    <div className='flex'>
+      <button type='button' onClick={() => addText(targetRef)}>Add Text</button>
+      <button type='button' onClick={() => removeText(targetRef)}>Remove Text</button>
+    </div>
+  )
+}
 
 function CompA() {
   const targetRef = useRef(null);
   return (
-    <div>
+    <div className='comp'>
       <p>Component A</p>
-      <button type='button' onClick={() => addText(targetRef)}>Add Text</button>
+      <Buttons targetRef={targetRef}/>
       <div ref={targetRef}></div>
     </div>
   )
@@ -20,9 +31,9 @@ function CompA() {
 function CompB() {
   const targetRef = useRef(null);
   return (
-    <div>
+    <div className='comp'>
       <p>Component B</p>
-      <button type='button' onClick={() => addText(targetRef)}>Add Text</button>
+      <Buttons targetRef={targetRef}/>
       <div ref={targetRef}></div>
     </div>
 
@@ -32,32 +43,34 @@ function CompB() {
 function CompC() {
   const targetRef = useRef(null);
   return (
-    <div>
+    <div className='comp'>
       <p>Component C</p>
-      <button type='button' onClick={() => addText(targetRef)}>Add Text</button>
+      <Buttons targetRef={targetRef}/>
       <div ref={targetRef}></div>
     </div>
   )
 }
 
-const replaceItem = (arr, newItem) => {
-  return arr.map(item => item.id === newItem.id ? newItem : item);
-};
+const replaceItem = (arr, newItem) => arr.map(item => item.id === newItem.id ? newItem : item);
 
 const serializedData = [
-  {id: 1, x: 0, y: 0, w: 2, h: 2, content: 'C1 -> x: 0, y: 0, w: 2, h: 2', Comp: CompA},
-  {id: 2, x: 2, y: 3, w: 3, content: 'C2 -> x: 2, y: 3, w: 3', Comp: CompB},
-  {id: 3, x: 1, y: 3, content: 'C3 -> x: 1, y: 3', Comp: CompC}
+  {id: 1, x: 0, y: 0, w: 2, h: 2, Comp: CompA},
+  {id: 2, x: 2, y: 3, w: 3, Comp: CompB},
+  {id: 3, x: 1, y: 3, Comp: CompC}
 ];
-
-GridStack.init();
 
 export function GridWidget() {
   const [layout, setLayout] = useState(serializedData);
   const gridRef = useRef(null);
 
   useEffect(() => {
-    const grid = GridStack.init();
+    const grid = GridStack.init({
+      sizeToContent: true,
+      margin: '8px',
+      acceptWidgets: true,
+      float: false,
+      minRow: 1,
+    }, gridRef.current);
 
     grid.on('change', (event, items) => {
       const newLayout = items.map(item => ({
@@ -66,9 +79,9 @@ export function GridWidget() {
         y: item.y,
         w: item.w,
         h: item.h,
-        content: item.el.textContent,
         Comp: item.Comp,
       }));
+      console.log('grid.on("change")');
       setLayout((item) => replaceItem(item, layout));
     });
 
@@ -78,7 +91,7 @@ export function GridWidget() {
   }, []);
 
   return (
-    <div className="grid-stack">
+    <div className="grid-stack" ref={gridRef}>
       {layout.map((item, index) => {
         const {id, x, y, w, h, Comp, content} = item;
         return (
@@ -97,8 +110,9 @@ export function GridWidget() {
             gs-h={h}
           >
             <div className="grid-stack-item-content">
-              {content}
-              <Comp />
+              <div className='gridStack-inner-wrap'>
+                <Comp/>
+              </div>
             </div>
           </div>
         )
