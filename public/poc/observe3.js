@@ -1,63 +1,8 @@
-import React, {useEffect, useState, useRef, useCallback} from "react";
-import {GridStack} from "gridstack";
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import { GridStack } from "gridstack";
 import '/node_modules/gridstack/dist/gridstack.min.css';
 
-const loremIpsum = 'Lorem ipsum dolor sit amet. Quo omnis doloribus ab rerum maiores aut labore autem in cupiditate velit sit voluptas nobis.|< END >|'
-
-const addText = (ref) => ref.current.innerHTML = `${ref.current.innerHTML} + ${loremIpsum}`;
-const removeText = (ref) => ref.current.innerHTML = '';
-
-function Buttons({targetRef}) {
-  if (!targetRef) return null
-  return (
-    <div className='flex'>
-      <button type='button' onClick={() => addText(targetRef)}>Add Text</button>
-      <button type='button' onClick={() => removeText(targetRef)}>Remove Text</button>
-    </div>
-  )
-}
-
-function CompA() {
-  const targetRef = useRef(null);
-  return (
-    <div className='comp'>
-      <p>Component A</p>
-      <Buttons targetRef={targetRef}/>
-      <div ref={targetRef}></div>
-    </div>
-  )
-}
-
-function CompB() {
-  const targetRef = useRef(null);
-  return (
-    <div className='comp'>
-      <p>Component B</p>
-      <Buttons targetRef={targetRef}/>
-      <div ref={targetRef}></div>
-    </div>
-
-  )
-}
-
-function CompC() {
-  const targetRef = useRef(null);
-  return (
-    <div className='comp'>
-      <p>Component C</p>
-      <Buttons targetRef={targetRef}/>
-      <div ref={targetRef}></div>
-    </div>
-  )
-}
-
-const replaceItem = (arr, newItem) => arr.map(item => item.id === newItem.id ? newItem : item);
-
-const serializedData = [
-  {id: 1, x: 0, y: 0, w: 3, Comp: CompA},
-  {id: 2, x: 3, y: 0, w: 3, Comp: CompB},
-  {id: 3, x: 1, y: 3, w: 3, Comp: CompC}
-];
+// ... (keep your existing code for CompA, CompB, CompC, etc.)
 
 export function GridWidget() {
   const [layout, setLayout] = useState(serializedData);
@@ -70,15 +15,14 @@ export function GridWidget() {
     if (!grid) return;
 
     for (let entry of entries) {
-      const {height} = entry.contentRect;
+      const { height } = entry.contentRect;
       const gridItem = entry.target.closest('.grid-stack-item');
-
       if (gridItem) {
         grid.update(gridItem, {
           h: Math.max(1, Math.ceil(height / grid.opts.cellHeight)),
         });
       } else {
-        console.error('no item!')
+        console.warn('no item!')
       }
     }
   }, []);
@@ -105,11 +49,9 @@ export function GridWidget() {
         h: item.h,
         Comp: item.Comp,
       }));
-      console.log('grid.on("change")');
-      setLayout((item) => replaceItem(item, layout));
+      setLayout(newLayout);
     });
 
-    // Create a ResizeObserver
     const observer = new ResizeObserver(resizeObserverCallback);
 
     widgetRefs.current.forEach((widgetRef) => {
@@ -122,13 +64,12 @@ export function GridWidget() {
       grid.destroy();
       observer.disconnect();
     };
-  }, []);
+  }, []); // Empty dependency array, run only once on mount
 
   return (
     <div className="grid-stack" ref={gridRef}>
       {layout.map((item, index) => {
-        const {id, x, y, w, h, Comp, content} = item;
-        console.log({item})
+        const { id, x, y, w, h, Comp } = item;
         return (
           <div
             className="grid-stack-item"
@@ -146,11 +87,11 @@ export function GridWidget() {
           >
             <div className="grid-stack-item-content">
               <div className='gridStack-inner-wrap' ref={(el) => widgetRefs.current[index] = el}>
-                <Comp/>
+                <Comp />
               </div>
             </div>
           </div>
-        )
+        );
       })}
     </div>
   );
