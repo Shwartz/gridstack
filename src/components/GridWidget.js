@@ -40,7 +40,7 @@ function CompA() {
       <h2>Component A</h2>
       <Buttons targetRef={targetRef}/>
       <div ref={targetRef}></div>
-      <ApexChartExample />
+      <ApexChartExample/>
     </div>
   )
 }
@@ -80,9 +80,8 @@ function CompD() {
 }
 
 const replaceItem = (arr, newItem) => arr.map(item => item.id === newItem.id ? newItem : item);
-
 const serializedData = [
-  {id: 1, x: 0, y: 0, w: 6, Comp: CompA},
+  {id: 1, x: 0, y: 0, w: 4, Comp: CompA},
   {id: 2, x: 6, y: 0, w: 3, Comp: CompB},
   {id: 3, x: 1, y: 3, w: 3, Comp: CompC},
   {id: 4, w: 4, Comp: CompD},
@@ -94,6 +93,7 @@ const serializedData = [
 
 export function GridWidget() {
   const [layout, setLayout] = useState(serializedData);
+  const [theme, toggleTheme] = useState(false);
   const gridInstanceRef = useRef(null);
   const gridDOMRef = useRef(null);
   const widgetRefs = useRef([]);
@@ -150,32 +150,38 @@ export function GridWidget() {
   }, []);
 
   return (
-    <div className="grid-stack" ref={gridDOMRef}>
-      {layout.map((item, index) => {
-        const {id, x, y, w, h, Comp, content} = item;
-        return (
-          <div
-            className="grid-stack-item"
-            key={id}
-            gs-id={id}
-            id={`id-${id}`}
-            data-gs-x={x}
-            data-gs-y={y}
-            data-gs-width={w}
-            data-gs-height={h}
-            gs-x={x}
-            gs-y={y}
-            gs-w={w}
-            gs-h={h}
-          >
-            <div className="grid-stack-item-content">
-              <div className='gridStack-inner-wrap' ref={(el) => widgetRefs.current[item.id] = el}>
-                <Comp/>
+    <>
+      <button
+        onClick={() => toggleTheme(!theme)}
+        className={`btn ${theme ? 'gridStackContainer' : ''}`}
+      >Toggle Theme</button>
+      <div className="grid-stack" ref={gridDOMRef}>
+        {layout.map((item, index) => {
+          const {id, x, y, w, h, Comp, content} = item;
+          return (
+            <div
+              className="grid-stack-item"
+              key={id}
+              gs-id={id}
+              id={`id-${id}`}
+              data-gs-x={x}
+              data-gs-y={y}
+              data-gs-width={w}
+              data-gs-height={h}
+              gs-x={x}
+              gs-y={y}
+              gs-w={w}
+              gs-h={h}
+            >
+              <div className="grid-stack-item-content">
+                <div className='gridStack-inner-wrap' ref={(el) => widgetRefs.current[item.id] = el}>
+                  <Comp/>
+                </div>
               </div>
             </div>
-          </div>
-        )
-      })}
-    </div>
+          )
+        })}
+      </div>
+    </>
   );
 }

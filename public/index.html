@@ -7,9 +7,11 @@
     <style>
         body {
             font-family: "Graphik", Arial, Helvetica, sans-serif, "Segoe UI", sans-serif;
+            background: #ccc;
         }
         .grid-stack {
-            background: #FAFAD2;
+            margin-top: 8px;
+            background: #f2f2f2;
         }
 
         .grid-stack-item-content {
@@ -95,6 +97,7 @@
             border-radius: 8px;
             background-image: linear-gradient(to bottom, #3498db, #2980b9);
             text-decoration: none;
+            cursor: pointer;
         }
 
         .btn:hover {
@@ -104,6 +107,24 @@
         .scrollable {
             overflow-x: auto;
         }
+
+        .trigger:has(+ .content .target) ~ .content .target {}
+        .gridStackContainer:has(+ .grid-stack .grid-stack-item-content) ~ .grid-stack .grid-stack-item-content {
+            border-radius: 8px;
+            background: white;
+            border: 1px solid #ccc;
+        }
+
+        .gridStackContainer:has(+ .grid-stack .grid-stack-item-content) ~ .grid-stack .grid-stack-item-content .gridStack-inner-wrap{
+            outline: none;
+        }
+
+        .gridStackContainer:has(+ .grid-stack .grid-stack-item-content) ~ .grid-stack .grid-stack-item-content .comp {
+            border: none;
+            background: none;
+        }
+
+
     </style>
 </head>
 <body>
