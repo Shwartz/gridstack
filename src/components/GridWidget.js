@@ -4,7 +4,7 @@ import '/node_modules/gridstack/dist/gridstack.min.css';
 import {ApexChartExample} from './Apex';
 
 const loremIpsum = '<p>Lorem ipsum dolor sit amet. Quo omnis doloribus ab rerum maiores aut labore autem in cupiditate velit sit voluptas nobis.|< END >|</p>'
-const tableIpsum = '<br/><table class="blueTable">\n' +
+const tableIpsum = '<br/><div class="scrollable"><table class="blueTable">\n' +
   '<tr>\n' +
   '  <th>Column 1</th>\n' +
   '  <th>Column 2</th>\n' +
@@ -17,7 +17,7 @@ const tableIpsum = '<br/><table class="blueTable">\n' +
   '<tr><td>Data 3-1</td><td>Data 3-2</td><td>Data 3-3</td><td>Data 3-4</td><td>Data 3-5</td></tr>\n' +
   '<tr><td>Data 4-1</td><td>Data 4-2</td><td>Data 4-3</td><td>Data 4-4</td><td>Data 4-5</td></tr>\n' +
   '<tr><td>Data 5-1</td><td>Data 5-2</td><td>Data 5-3</td><td>Data 5-4</td><td>Data 5-5</td></tr>\n' +
-  '</table>'
+  '</table></div>'
 const addText = (ref) => ref.current.innerHTML = `${ref.current.innerHTML} ${loremIpsum}`;
 const addTable = (ref) => ref.current.innerHTML = `${ref.current.innerHTML} ${tableIpsum}`;
 const removeText = (ref) => ref.current.innerHTML = '';
@@ -68,12 +68,28 @@ function CompC() {
   )
 }
 
+function CompD() {
+  const targetRef = useRef(null);
+  return (
+    <div className='comp'>
+      <h2>Component D</h2>
+      <Buttons targetRef={targetRef}/>
+      <div ref={targetRef}></div>
+    </div>
+  )
+}
+
 const replaceItem = (arr, newItem) => arr.map(item => item.id === newItem.id ? newItem : item);
 
 const serializedData = [
   {id: 1, x: 0, y: 0, w: 6, Comp: CompA},
   {id: 2, x: 6, y: 0, w: 3, Comp: CompB},
-  {id: 3, x: 1, y: 3, w: 3, Comp: CompC}
+  {id: 3, x: 1, y: 3, w: 3, Comp: CompC},
+  {id: 4, w: 4, Comp: CompD},
+  {id: 5, w: 4, Comp: CompB},
+  {id: 6, w: 4, Comp: CompC},
+  {id: 7, w: 4, Comp: CompD},
+  {id: 8, w: 4, Comp: CompC},
 ];
 
 export function GridWidget() {
