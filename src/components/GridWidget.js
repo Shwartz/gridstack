@@ -1,6 +1,7 @@
 import React, {useEffect, useState, useRef, useCallback} from "react";
 import {GridStack} from "gridstack";
 import '/node_modules/gridstack/dist/gridstack.min.css';
+import {ApexChartExample} from './Apex';
 
 const loremIpsum = '<p>Lorem ipsum dolor sit amet. Quo omnis doloribus ab rerum maiores aut labore autem in cupiditate velit sit voluptas nobis.|< END >|</p>'
 const tableIpsum = '<br/><table class="blueTable">\n' +
@@ -25,9 +26,9 @@ function Buttons({targetRef}) {
   if (!targetRef) return null
   return (
     <div className='flex'>
-      <button type='button' onClick={() => addText(targetRef)}>Add Text</button>
-      <button type='button' onClick={() => addTable(targetRef)}>Add Table</button>
-      <button type='button' onClick={() => removeText(targetRef)}>Remove Text</button>
+      <button className='btn' type='button' onClick={() => addText(targetRef)}>Add Text</button>
+      <button className='btn' type='button' onClick={() => addTable(targetRef)}>Add Table</button>
+      <button className='btn' type='button' onClick={() => removeText(targetRef)}>Remove Text</button>
     </div>
   )
 }
@@ -39,6 +40,7 @@ function CompA() {
       <p>Component A</p>
       <Buttons targetRef={targetRef}/>
       <div ref={targetRef}></div>
+      <ApexChartExample />
     </div>
   )
 }
@@ -69,8 +71,8 @@ function CompC() {
 const replaceItem = (arr, newItem) => arr.map(item => item.id === newItem.id ? newItem : item);
 
 const serializedData = [
-  {id: 1, x: 0, y: 0, w: 3, Comp: CompA},
-  {id: 2, x: 3, y: 0, w: 3, Comp: CompB},
+  {id: 1, x: 0, y: 0, w: 6, Comp: CompA},
+  {id: 2, x: 6, y: 0, w: 3, Comp: CompB},
   {id: 3, x: 1, y: 3, w: 3, Comp: CompC}
 ];
 
@@ -102,8 +104,8 @@ export function GridWidget() {
 
     const grid = gridInstanceRef.current = GridStack.init({
       sizeToContent: true,
-      margin: '8px',
       acceptWidgets: true,
+      margin: '8px',
       float: false,
       minRow: 1,
     }, gridRef.current);
