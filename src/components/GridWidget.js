@@ -37,7 +37,7 @@ function CompA() {
   const targetRef = useRef(null);
   return (
     <div className='comp'>
-      <p>Component A</p>
+      <h2>Component A</h2>
       <Buttons targetRef={targetRef}/>
       <div ref={targetRef}></div>
       <ApexChartExample />
@@ -49,7 +49,7 @@ function CompB() {
   const targetRef = useRef(null);
   return (
     <div className='comp'>
-      <p>Component B</p>
+      <h2>Component B</h2>
       <Buttons targetRef={targetRef}/>
       <div ref={targetRef}></div>
     </div>
@@ -61,7 +61,7 @@ function CompC() {
   const targetRef = useRef(null);
   return (
     <div className='comp'>
-      <p>Component C</p>
+      <h2>Component C</h2>
       <Buttons targetRef={targetRef}/>
       <div ref={targetRef}></div>
     </div>
@@ -78,29 +78,25 @@ const serializedData = [
 
 export function GridWidget() {
   const [layout, setLayout] = useState(serializedData);
-  const gridRef = useRef(null);
-  const widgetRefs = useRef([]);
   const gridInstanceRef = useRef(null);
+  const gridDOMRef = useRef(null);
+  const widgetRefs = useRef([]);
 
   const resizeObserverCallback = useCallback((entries) => {
-    console.log('calling resizeObserverCallback')
     const grid = gridInstanceRef.current;
     if (!grid) return;
 
     for (let entry of entries) {
-      const {height} = entry.contentRect;
       const gridItem = entry.target.closest('.grid-stack-item');
 
       if (gridItem) {
         grid.resizeToContent(gridItem);
-      } else {
-        console.error('no item!')
       }
     }
   }, []);
 
   useEffect(() => {
-    if (!gridRef.current) return;
+    if (!gridDOMRef.current) return;
 
     const grid = gridInstanceRef.current = GridStack.init({
       sizeToContent: true,
@@ -108,10 +104,9 @@ export function GridWidget() {
       margin: '8px',
       float: false,
       minRow: 1,
-    }, gridRef.current);
+    }, gridDOMRef.current);
 
     grid.on('change', (event, items) => {
-      console.log(event.currentTarget)
       const newLayout = items.map(item => ({
         id: item.id,
         x: item.x,
@@ -120,7 +115,6 @@ export function GridWidget() {
         h: item.h,
         Comp: item.Comp,
       }));
-      console.log('grid.on("change")');
       setLayout((item) => replaceItem(item, newLayout));
     });
 
@@ -140,10 +134,9 @@ export function GridWidget() {
   }, []);
 
   return (
-    <div className="grid-stack" ref={gridRef}>
+    <div className="grid-stack" ref={gridDOMRef}>
       {layout.map((item, index) => {
         const {id, x, y, w, h, Comp, content} = item;
-        console.log({item})
         return (
           <div
             className="grid-stack-item"

@@ -42,7 +42,7 @@ export const ApexChartExample = () => {
 
   return (
     <div>
-      <h2>Sales Over Years</h2>
+      <h3>Sales Over Years</h3>
       <Chart
         options={chartData.options}
         series={chartData.series}
