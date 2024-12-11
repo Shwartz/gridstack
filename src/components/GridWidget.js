@@ -94,6 +94,7 @@ const serializedData = [
 export function GridWidget() {
   const [layout, setLayout] = useState(serializedData);
   const [theme, toggleTheme] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const gridInstanceRef = useRef(null);
   const gridDOMRef = useRef(null);
   const widgetRefs = useRef([]);
@@ -112,6 +113,20 @@ export function GridWidget() {
   }, []);
 
   useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth)
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (gridInstanceRef.current) {
+      gridInstanceRef.current.cellHeight(windowWidth < 1025 ? '1px' : 'auto');
+    }
+  }, [windowWidth]);
+
+  useEffect(() => {
     if (!gridDOMRef.current) return;
 
     const grid = gridInstanceRef.current = GridStack.init({
@@ -120,6 +135,14 @@ export function GridWidget() {
       margin: '8px',
       float: false,
       minRow: 1,
+      cellHeight: windowWidth < 1025 ? '1px' : 'auto',
+      columnOpts: {
+        breakpointForWindow: true,
+        breakpoints: [
+          {w: 1024, c: 1},
+          {w: 1025, c: 12},
+        ],
+      },
     }, gridDOMRef.current);
 
     grid.on('change', (event, items) => {
