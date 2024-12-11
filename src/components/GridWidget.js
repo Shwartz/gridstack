@@ -81,14 +81,14 @@ function CompD() {
 
 const replaceItem = (arr, newItem) => arr.map(item => item.id === newItem.id ? newItem : item);
 const serializedData = [
-  {id: 1, x: 0, y: 0, w: 4, Comp: CompA},
-  {id: 2, x: 6, y: 0, w: 3, Comp: CompB},
-  {id: 3, x: 1, y: 3, w: 3, Comp: CompC},
-  {id: 4, w: 4, Comp: CompD},
-  {id: 5, w: 4, Comp: CompB},
-  {id: 6, w: 4, Comp: CompC},
-  {id: 7, w: 4, Comp: CompD},
-  {id: 8, w: 4, Comp: CompC},
+  {id: '1a', x: 0, y: 0, w: 4, Comp: CompA},
+  {id: '2a', x: 6, y: 0, w: 3, Comp: CompB},
+  {id: '3a', x: 1, y: 3, w: 3, Comp: CompC},
+  {id: '4a', w: 4, Comp: CompD},
+  {id: '5a', w: 4, Comp: CompB},
+  {id: '6a', w: 4, Comp: CompC},
+  {id: '7a', w: 4, Comp: CompD},
+  {id: '8a', w: 4, Comp: CompC},
 ];
 
 export function GridWidget() {
@@ -137,7 +137,7 @@ export function GridWidget() {
     // Create a ResizeObserver
     const observer = new ResizeObserver(resizeObserverCallback);
 
-    widgetRefs.current.forEach((widgetRef) => {
+    Object.values(widgetRefs.current).forEach((widgetRef) => {
       if (widgetRef) {
         observer.observe(widgetRef);
       }
