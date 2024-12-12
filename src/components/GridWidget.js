@@ -32,7 +32,6 @@ function Buttons({targetRef}) {
     </div>
   )
 }
-
 function CompA() {
   const targetRef = useRef(null);
   return (
@@ -44,7 +43,6 @@ function CompA() {
     </div>
   )
 }
-
 function CompB() {
   const targetRef = useRef(null);
   return (
@@ -56,7 +54,6 @@ function CompB() {
 
   )
 }
-
 function CompC() {
   const targetRef = useRef(null);
   return (
@@ -67,7 +64,6 @@ function CompC() {
     </div>
   )
 }
-
 function CompD() {
   const targetRef = useRef(null);
   return (
@@ -79,22 +75,22 @@ function CompD() {
   )
 }
 
-const replaceItem = (arr, newItem) => arr.map(item => item.id === newItem.id ? newItem : item);
 const serializedData = [
   {id: '1a', x: 0, y: 0, w: 4, Comp: CompA},
-  {id: '2a', x: 6, y: 0, w: 3, Comp: CompB},
-  {id: '3a', x: 1, y: 3, w: 3, Comp: CompC},
-  {id: '4a', w: 4, Comp: CompD},
-  {id: '5a', w: 4, Comp: CompB},
-  {id: '6a', w: 4, Comp: CompC},
-  {id: '7a', w: 4, Comp: CompD},
-  {id: '8a', w: 4, Comp: CompC},
+  {id: '2a', x: 6, y: 0, w: 2, Comp: CompB},
+  {id: '3a', x: 1, y: 6, w: 3, Comp: CompC},
+  {id: '4a', x: 0, y: 8, w: 4, Comp: CompD},
+  {id: '5a', x: 4, y: 5, w: 4, Comp: CompB},
+  {id: '6a', x: 8, y: 5, w: 4, Comp: CompC},
+  {id: '7a', x: 8, y: 7, w: 4, Comp: CompD},
+  {id: '8a', x: 4, y: 7, w: 4, Comp: CompC},
 ];
+
+const getComponentById = (data, id) => data.find((item) => item.id).Comp;
 
 export function GridWidget() {
   const [layout, setLayout] = useState(serializedData);
   const [theme, toggleTheme] = useState(false);
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const gridInstanceRef = useRef(null);
   const gridDOMRef = useRef(null);
   const widgetRefs = useRef([]);
@@ -113,20 +109,6 @@ export function GridWidget() {
   }, []);
 
   useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth)
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  useEffect(() => {
-    if (gridInstanceRef.current) {
-      gridInstanceRef.current.cellHeight(windowWidth < 1025 ? '1px' : 'auto');
-    }
-  }, [windowWidth]);
-
-  useEffect(() => {
     if (!gridDOMRef.current) return;
 
     const grid = gridInstanceRef.current = GridStack.init({
@@ -134,8 +116,8 @@ export function GridWidget() {
       acceptWidgets: true,
       margin: '8px',
       float: false,
-      minRow: 1,
-      cellHeight: windowWidth < 1025 ? '1px' : 'auto',
+      // minRow: 1,
+      cellHeight: 1,
       columnOpts: {
         breakpointForWindow: true,
         breakpoints: [
@@ -145,16 +127,24 @@ export function GridWidget() {
       },
     }, gridDOMRef.current);
 
-    grid.on('change', (event, items) => {
-      const newLayout = items.map(item => ({
+    // GridStack pass only coordinates and doesn't keep additional info
+    grid.on('change', (event, movedItems) => {
+      const newLayout = movedItems.map(item => ({
         id: item.id,
         x: item.x,
         y: item.y,
         w: item.w,
         h: item.h,
-        Comp: item.Comp,
+        Comp: getComponentById(serializedData, item.id),
       }));
-      setLayout((item) => replaceItem(item, newLayout));
+      // Create map of changed items by id
+      const newLayoutMap = new Map(newLayout.map(item => [item.id, item]));
+      // Update layout and update changed item by id
+      const updatedLayout = serializedData.map(item =>
+        newLayoutMap.has(item.id) ? {...item , ...newLayoutMap.get(item.id)} : item
+      );
+      // setLayout(updatedLayout);
+      console.log('onChange updatedLayout: ', updatedLayout)
     });
 
     // Create a ResizeObserver
@@ -177,7 +167,8 @@ export function GridWidget() {
       <button
         onClick={() => toggleTheme(!theme)}
         className={`btn ${theme ? 'gridStackContainer' : ''}`}
-      >Toggle Theme</button>
+      >Toggle Theme
+      </button>
       <div className="grid-stack" ref={gridDOMRef}>
         {layout.map((item, index) => {
           const {id, x, y, w, h, Comp, content} = item;
