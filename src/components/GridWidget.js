@@ -22,6 +22,19 @@ const addText = (ref) => ref.current.innerHTML = `${ref.current.innerHTML} ${lor
 const addTable = (ref) => ref.current.innerHTML = `${ref.current.innerHTML} ${tableIpsum}`;
 const removeText = (ref) => ref.current.innerHTML = '';
 
+const useLocalStorageLayout = (key, initialValue) => {
+  const [layoutFromStorage, setLayoutToStorage] = useState(() => {
+    const storedLayout = localStorage.getItem(key);
+    return storedLayout ? JSON.parse(storedLayout) : initialValue;
+  });
+
+  useEffect(() => {
+    localStorage.setItem(key, JSON.stringify(layoutFromStorage));
+  }, [key, layoutFromStorage]);
+
+  return [layoutFromStorage, setLayoutToStorage];
+};
+
 function Buttons({targetRef}) {
   if (!targetRef) return null
   return (
@@ -32,6 +45,7 @@ function Buttons({targetRef}) {
     </div>
   )
 }
+
 function CompA() {
   const targetRef = useRef(null);
   return (
@@ -43,6 +57,7 @@ function CompA() {
     </div>
   )
 }
+
 function CompB() {
   const targetRef = useRef(null);
   return (
@@ -54,6 +69,7 @@ function CompB() {
 
   )
 }
+
 function CompC() {
   const targetRef = useRef(null);
   return (
@@ -64,6 +80,7 @@ function CompC() {
     </div>
   )
 }
+
 function CompD() {
   const targetRef = useRef(null);
   return (
@@ -76,20 +93,32 @@ function CompD() {
 }
 
 const serializedData = [
-  {id: '1a', x: 0, y: 0, w: 4, Comp: CompA},
-  {id: '2a', x: 6, y: 0, w: 2, Comp: CompB},
-  {id: '3a', x: 1, y: 6, w: 3, Comp: CompC},
-  {id: '4a', x: 0, y: 8, w: 4, Comp: CompD},
-  {id: '5a', x: 4, y: 5, w: 4, Comp: CompB},
-  {id: '6a', x: 8, y: 5, w: 4, Comp: CompC},
-  {id: '7a', x: 8, y: 7, w: 4, Comp: CompD},
-  {id: '8a', x: 4, y: 7, w: 4, Comp: CompC},
+  {id: '1a', x: 0, y: 0, w: 4},
+  {id: '2a', x: 6, y: 0, w: 2},
+  {id: '3a', x: 1, y: 6, w: 3},
+  {id: '4a', x: 0, y: 8, w: 4},
+  {id: '5a', x: 4, y: 5, w: 4},
+  {id: '6a', x: 8, y: 5, w: 4},
+  {id: '7a', x: 8, y: 7, w: 4},
+  {id: '8a', x: 4, y: 7, w: 4},
 ];
 
-const getComponentById = (data, id) => data.find((item) => item.id).Comp;
+const serializedComponents = [
+  {id: '1a', Comp: CompA},
+  {id: '2a', Comp: CompB},
+  {id: '3a', Comp: CompC},
+  {id: '4a', Comp: CompD},
+  {id: '5a', Comp: CompB},
+  {id: '6a', Comp: CompC},
+  {id: '7a', Comp: CompD},
+  {id: '8a', Comp: CompC},
+]
+
+const getComponentById = (data, id) => data.find((item) => item.id === id)?.Comp;
 
 export function GridWidget() {
-  const [layout, setLayout] = useState(serializedData);
+  const [layoutFromStorage, setLayoutToStorage] = useLocalStorageLayout('gridStack-layout', serializedData);
+  const [layout, setLayout] = useState(layoutFromStorage || serializedData);
   const [theme, toggleTheme] = useState(false);
   const gridInstanceRef = useRef(null);
   const gridDOMRef = useRef(null);
@@ -127,7 +156,6 @@ export function GridWidget() {
       },
     }, gridDOMRef.current);
 
-    // GridStack pass only coordinates and doesn't keep additional info
     grid.on('change', (event, movedItems) => {
       const newLayout = movedItems.map(item => ({
         id: item.id,
@@ -135,16 +163,15 @@ export function GridWidget() {
         y: item.y,
         w: item.w,
         h: item.h,
-        Comp: getComponentById(serializedData, item.id),
       }));
       // Create map of changed items by id
       const newLayoutMap = new Map(newLayout.map(item => [item.id, item]));
       // Update layout and update changed item by id
-      const updatedLayout = serializedData.map(item =>
-        newLayoutMap.has(item.id) ? {...item , ...newLayoutMap.get(item.id)} : item
+      const updatedLayout = layout.map(item =>
+        newLayoutMap.has(item.id) ? {...item, ...newLayoutMap.get(item.id)} : item
       );
-      // setLayout(updatedLayout);
-      console.log('onChange updatedLayout: ', updatedLayout)
+      console.log('--- onChange: ', updatedLayout);
+      setLayoutToStorage(updatedLayout);
     });
 
     // Create a ResizeObserver
@@ -162,6 +189,15 @@ export function GridWidget() {
     };
   }, []);
 
+  const enrichedLayout = layout.map(item => ({
+    id: item.id,
+    x: item.x,
+    y: item.y,
+    w: item.w,
+    h: item.h,
+    Comp: getComponentById(serializedComponents, item.id)
+  }))
+
   return (
     <>
       <button
@@ -170,7 +206,7 @@ export function GridWidget() {
       >Toggle Theme
       </button>
       <div className="grid-stack" ref={gridDOMRef}>
-        {layout.map((item, index) => {
+        {enrichedLayout.map((item, index) => {
           const {id, x, y, w, h, Comp, content} = item;
           return (
             <div
@@ -189,7 +225,7 @@ export function GridWidget() {
             >
               <div className="grid-stack-item-content">
                 <div className='gridStack-inner-wrap' ref={(el) => widgetRefs.current[item.id] = el}>
-                  <Comp/>
+                  {Comp && <Comp/>}
                 </div>
               </div>
             </div>
